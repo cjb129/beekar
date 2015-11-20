@@ -516,6 +516,14 @@ Parser::record_decl(Specifier spec)
   require(struct_kw);
   Token n = match(identifier_tok);
 
+  // Determine if it is inheriting from a base class
+  if(match_if(colon_tok)){
+    // We are inheriting
+    Token t = match(identifier_tok);
+    // Make sure that the class exists
+
+  }
+
   // record-body and field-seq
   require(lbrace_tok);
   Decl_seq fs, ms;
