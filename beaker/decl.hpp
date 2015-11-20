@@ -7,6 +7,7 @@
 #include "prelude.hpp"
 #include "scope.hpp"
 #include "specifier.hpp"
+#include "type.hpp"
 
 
 // Represents the declaration of a named entity.
@@ -146,7 +147,7 @@ struct Parameter_decl : Decl
 // member lookup.
 struct Record_decl : Decl
 {
-  Record_decl(Symbol const* n, Decl_seq const& f, Decl_seq const& m, Record_decl const* base)
+  Record_decl(Symbol const* n, Decl_seq const& f, Decl_seq const& m, Type const* base)
     : Decl(n, nullptr), fields_(f), members_(m), scope_(this), base_(base)
   { }
 
@@ -162,7 +163,7 @@ struct Record_decl : Decl
   Decl_seq fields_;
   Decl_seq members_;
   Scope    scope_;
-    const Record_decl* base_;
+    const Type* base_;
 };
 
 

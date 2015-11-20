@@ -515,13 +515,11 @@ Parser::record_decl(Specifier spec)
 {
   require(struct_kw);
   Token n = match(identifier_tok);
-
+  const Type* t = nullptr;
   // Determine if it is inheriting from a base class
   if(match_if(colon_tok)){
-    // We are inheriting
-    Token t = match(identifier_tok);
-    // Make sure that the class exists
-
+    // We have a base class
+    t = type();
   }
 
   // record-body and field-seq
@@ -542,7 +540,7 @@ Parser::record_decl(Specifier spec)
   match(rbrace_tok);
 
   // Need to replace nullptr with base record
-  return on_record(spec, n, fs, ms, nullptr);
+  return on_record(spec, n, fs, ms, t);
 }
 
 
@@ -1268,7 +1266,7 @@ Parser::on_function(Specifier spec, Token tok, Decl_seq const& p, Type const* t,
 
 
 Decl*
-Parser::on_record(Specifier spec, Token n, Decl_seq const& fs, Decl_seq const& ms, Record_decl const* base)
+Parser::on_record(Specifier spec, Token n, Decl_seq const& fs, Decl_seq const& ms, Type const* base)
 {
   Decl* decl = new Record_decl(n.symbol(), fs, ms, base);
   locate(decl, n.location());
