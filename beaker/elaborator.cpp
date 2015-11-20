@@ -1239,6 +1239,19 @@ Elaborator::elaborate(Record_decl* d)
   // the elaboration of dot expressions.
   stack.push(d->scope());
 
+  // Elaborate parent
+  if(d->base_ != nullptr) {
+    Record_type const* base = cast<Record_type>(elaborate(d->base_));
+
+    for(Decl*& f : base->declaration()->fields_){
+      d->fields_.push_back(f);
+    }
+    for(Decl*& m : base->declaration()->members_){
+      d->members_.push_back(m);
+    }
+
+  }
+  //for(auto &x : dynamic_cast<Record_type>(d->base_).decl_.)
   // Elaborate fields and then method declarations.
   //
   // TODO: What are the lookup rules for default
