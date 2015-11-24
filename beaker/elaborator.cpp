@@ -1229,15 +1229,11 @@ Elaborator::elaborate(Parameter_decl* d)
 }
 
 
+
 Decl*
 Elaborator::elaborate(Record_decl* d)
 {
   declare(d);
-
-  // Push the stack onto scope. Note that the record
-  // saves this information for later lookup. See
-  // the elaboration of dot expressions.
-  stack.push(d->scope());
 
   // Elaborate parent
   if(d->base_ != nullptr) {
@@ -1251,7 +1247,7 @@ Elaborator::elaborate(Record_decl* d)
     }
 
   }
-  //for(auto &x : dynamic_cast<Record_type>(d->base_).decl_.)
+
   // Elaborate fields and then method declarations.
   //
   // TODO: What are the lookup rules for default
@@ -1268,6 +1264,7 @@ Elaborator::elaborate(Record_decl* d)
   //
   // If we allow the 2nd, then we need to do two
   // phase elaboration.
+  Scope_sentinel scope(*this, d->scope());
   for (Decl*& f : d->fields_)
     f = elaborate_decl(f);
   for (Decl*& m : d->members_)
@@ -1277,9 +1274,6 @@ Elaborator::elaborate(Record_decl* d)
   // above about handling member defintions.
   for (Decl*& m : d->members_)
     m = elaborate_def(m);
-
-  // Pop the stack off the scope.
-  stack.take();
 
   return d;
 }
