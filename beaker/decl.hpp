@@ -164,6 +164,7 @@ struct Record_decl : Decl
   Decl_seq members_;
   Scope    scope_;
     const Type* base_;
+    const Record_decl *base_decl;
 };
 
 

@@ -985,6 +985,12 @@ Generator::gen(Record_decl const* d)
   // mixing methods and fields in the same thing.
   // They need to be separate.
   std::vector<llvm::Type*> ts;
+  if(types.lookup(d->base_decl)) {
+    auto i = types.get(d->base_decl);
+    ts.push_back(i.second);
+  }
+
+
   if (d->fields().empty()) {
     ts.push_back(build.getInt8Ty());
   } else {

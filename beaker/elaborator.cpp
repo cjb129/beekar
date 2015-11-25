@@ -1240,13 +1240,13 @@ Elaborator::elaborate(Record_decl* d)
   // Elaborate parent
   if(d->base_ != nullptr) {
     Record_type const* base = cast<Record_type>(elaborate(d->base_));
-
-    for(Decl*& f : base->declaration()->fields_){
-      d->fields_.push_back(f);
-    }
-    for(Decl*& m : base->declaration()->members_){
-      d->members_.push_back(m);
-    }
+    d->base_decl = base->declaration();
+//    for(Decl*& f : base->declaration()->fields_){
+//      d->fields_.push_back(f);
+//    }
+//    for(Decl*& m : base->declaration()->members_){
+//      d->members_.push_back(m);
+//    }
 
   }
 
