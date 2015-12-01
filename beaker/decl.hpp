@@ -180,7 +180,7 @@ struct Field_decl : Decl
 
   Record_decl const* context() const { return cast<Record_decl>(cxt_); }
 
-  int index() const;
+  std::vector<int> index() const;
 };
 
 
