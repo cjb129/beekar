@@ -24,9 +24,25 @@ struct Scope : Environment<Symbol const*, Overload>
     : decl(d)
   { }
 
+  virtual ~Scope() { }
+
+  virtual Binding * lookup(Symbol const* sym) {
+    return lookup(sym);
+  }
+
   Decl* decl;
 };
 
+struct Record_Scope : Scope {
+
+  Record_Scope() {}
+
+  Binding * lookup(Symbol const* sym) {
+      //TODO: check decl if it's a record?
+      //perform record lookup?
+      return lookup(sym);
+  }
+};
 
 // The scope stack maintains the current scope during
 // elaboration. It adapts the more general stack to
