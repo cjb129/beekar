@@ -148,7 +148,7 @@ struct Parameter_decl : Decl
 struct Record_decl : Decl
 {
   Record_decl(Symbol const* n, Decl_seq const& f, Decl_seq const& m, Type const* base)
-    : Decl(n, nullptr), fields_(f), members_(m), scope_(this), base_(base)
+    : Decl(n, nullptr), fields_(f), members_(m), scope_(this), base_(base), base_decl(nullptr)
   { }
 
   void accept(Visitor& v) const { v.visit(this); }
