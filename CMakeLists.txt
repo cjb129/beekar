@@ -42,7 +42,7 @@ set(BEAKER_NATIVE_ARCHIVER ${CMAKE_AR})
 
 
 # Compiler configuration
-set(CMAKE_CXX_FLAGS "-Wall -std=c++1y")
+set(CMAKE_CXX_FLAGS "-g -Wall -std=c++1y")
 
 
 # Configuration for lingo dependencies
