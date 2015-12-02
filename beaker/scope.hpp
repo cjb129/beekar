@@ -26,6 +26,7 @@ struct Scope : Environment<Symbol const*, Overload>
 
   virtual ~Scope() { }
 
+
   virtual Binding * lookup(Symbol const* sym) {
     return Environment::lookup(sym);
   }
@@ -33,15 +34,22 @@ struct Scope : Environment<Symbol const*, Overload>
   Decl* decl;
 };
 
-struct Record_Scope : Scope {
+struct Record_scope : Scope {
 
-  Record_Scope() {}
+  Record_scope() {}
 
-  Binding * lookup(Symbol const* sym) {
-      //TODO: check decl if it's a record?
-      //perform record lookup?
-      return lookup(sym);
-  }
+  auto lookup(Symbol const* sym) -> Binding*; 
+  // {
+  //     //TODO: check decl if it's a record?
+  //     //perform record lookup?
+  //     if(Field_decl* fn = as<Field_decl>(this->decl)) {
+  //       for (auto iter : fn->index()) {
+  //         if (Binding* bind = lookup(fn->index()[iter]))
+  //           return bind;
+  //       }
+  //     }
+  //     return lookup(sym);
+  // }
 };
 
 // The scope stack maintains the current scope during
