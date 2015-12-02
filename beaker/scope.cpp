@@ -57,14 +57,11 @@ Scope_stack::record() const
 }
 
 auto
-Record_scope::lookup(Symbol const* sym) -> Binding* {
-  //TODO: check decl if it's a record?
-  //perform record lookup?
-  if(Field_decl* fn = as<Field_decl>(this->decl)) {
-    for (int i = 0; i < fn->index().size(); i++) {
-      if (Binding* bind = Environment::lookup(fn->name()))
-        return bind;
-    }
+Record_scope::lookup(Symbol const* sym) -> Binding* 
+{
+  if(Record_decl* fn = as<Record_decl>(this->decl)) {
+    if (Binding* bind = Environment::lookup(fn->name()))
+      return bind;
   }
 
   return nullptr;
