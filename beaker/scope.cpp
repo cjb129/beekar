@@ -60,9 +60,9 @@ auto
 Record_scope::lookup(Symbol const* sym) -> Binding* {
   //TODO: check decl if it's a record?
   //perform record lookup?
-  if(Field_decl* fn = as<Field_decl>(this->decl)) {
-    for (int i = 0; i < fn->index().size(); i++) {
-      if (Binding* bind = Environment::lookup(fn->name()))
+  if(Record_decl* rec = as<Record_decl>(this->decl)) {
+    for(auto x : rec->fields()){
+      if(Binding* bind = Environment::lookup(x->name()))
         return bind;
     }
   }
