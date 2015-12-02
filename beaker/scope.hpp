@@ -27,7 +27,7 @@ struct Scope : Environment<Symbol const*, Overload>
   virtual ~Scope() { }
 
   virtual Binding * lookup(Symbol const* sym) {
-    return lookup(sym);
+    return Environment::lookup(sym);
   }
 
   Decl* decl;
