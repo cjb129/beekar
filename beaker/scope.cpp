@@ -62,10 +62,10 @@ Record_scope::lookup(Symbol const* sym) -> Binding* {
   //perform record lookup?
   if(Field_decl* fn = as<Field_decl>(this->decl)) {
     for (int i = 0; i < fn->index().size(); i++) {
-      if (Binding* bind = lookup(fn->name()))
+      if (Binding* bind = Environment::lookup(fn->name()))
         return bind;
     }
   }
 
-  return lookup(sym);
+  return nullptr;
 }

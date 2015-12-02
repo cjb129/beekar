@@ -36,21 +36,21 @@ struct Scope : Environment<Symbol const*, Overload>
 
 struct Record_scope : Scope {
 
-  Record_scope() {}
+  Record_scope()
+    : decl(nullptr)
+  { }
+
+  Record_scope(Record_decl *d)
+    : decl(d)
+  { }
 
   auto lookup(Symbol const* sym) -> Binding*; 
-  // {
-  //     //TODO: check decl if it's a record?
-  //     //perform record lookup?
-  //     if(Field_decl* fn = as<Field_decl>(this->decl)) {
-  //       for (auto iter : fn->index()) {
-  //         if (Binding* bind = lookup(fn->index()[iter]))
-  //           return bind;
-  //       }
-  //     }
-  //     return lookup(sym);
-  // }
+
+  Record_decl* decl;
+
 };
+
+
 
 // The scope stack maintains the current scope during
 // elaboration. It adapts the more general stack to

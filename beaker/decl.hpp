@@ -162,7 +162,7 @@ struct Record_decl : Decl
 
   Decl_seq fields_;
   Decl_seq members_;
-  Scope    scope_;
+  Record_scope    scope_;
     const Type* base_;
     const Record_decl *base_decl;
 };
