@@ -1,6 +1,7 @@
 // Copyright (c) 2015 Andrew Sutton
 // All rights reserved
 
+#include <iostream>
 #include "decl.hpp"
 #include "type.hpp"
 
@@ -25,6 +26,7 @@ Field_decl::index() const
 	auto current = context();
 	std::vector<int> ret;
 	Decl_seq const& f = current->fields();
+    int i = current->fields().size();
 	for (int i = 0; i < f.size(); ++i)
 		if (f[i] == this) {
 		  ret.push_back(i);

@@ -17,6 +17,20 @@
 // -------------------------------------------------------------------------- //
 // Declaration of entities
 
+Overload*
+Elaborator::qualified_lookup(Record_decl* r, Symbol const* sym)
+{
+    auto s = r->scope();
+    auto temp = r;
+    if (Scope::Binding* bind = s->lookup(sym))
+        return &bind->second;
+    else
+        while(temp = temp->base_decl)
+        if (Scope::Binding* bind = temp->scope()->lookup(sym)) {
+            return &bind->second;
+        }
+        return nullptr;
+}
 
 // Determine if d can be overloaded with the existing
 // elements in the set.
@@ -943,7 +957,6 @@ Elaborator::elaborate(Dot_expr* e)
     ss << "object does not have record type";
     throw Type_error({}, ss.str());
   }
-
   // We expect the member to be an unresolved id expression.
   // If it isn't, there's not much we can do with it.
   //
@@ -959,7 +972,7 @@ Elaborator::elaborate(Dot_expr* e)
   Id_expr* id = cast<Id_expr>(e2);
 
   // Perform qualified lookup on the member.
-  Overload* ovl = qualified_lookup(t->scope(), id->symbol());
+  Overload* ovl = qualified_lookup(t->declaration(), id->symbol());
   if (!ovl) {
     String msg = format("no member matching '{}'", *id);
     throw Lookup_error(locate(id), msg);
@@ -1495,104 +1508,63 @@ Elaborator::is_defining(Decl const* d) const
 Decl*
 Elaborator::elaborate_def(Record_decl* d)
 {
-//  // If the declaration has already been declared,
-//  // then don't re-elaborate it.
-//  if (defined.count(d))
-//    return d;
-//
-//  // Prevent recursive type definitions.
-//  if (is_defining(d)) {
-//    std::cerr << format("cyclic definition of '{}'\n", *d->name());
-//    for (auto iter = defining.rbegin(); iter != defining.rend(); ++iter) {
-//      if (*iter == d)
-//        break;
-//      std::cerr << format("  referenced in the definition of '{}'\n", *(*iter)->name());
-//    }
-//    throw Type_error(locate(d), format("cyclic definition of '{}'", *d->name()));
-//  }
-//  Defining_sentinel def(*this, d);
-//
-//  // Elaborate fields and then method declarations.
-//  //
-//  // TODO: What are the lookup rules for default
-//  // member initializers. If we do this:
-//  //
-//  //    struct S {
-//  //      x : int = 1;
-//  //      y : int = x + 2; // Seems resonable.
-//  //
-//  //      a : int = b - 1; // OK?
-//  //      b : int = 0;
-//  //      // Making this okay could impose an alternative
-//  //      // initialization order.
-//  //
-//  //      g : int = f();   // OK?
-//  //      def f() -> int { ... }
-//  //      // What if f() refers to an uninitialized fiedl?
-//  //    }
-//  //
-//  // If we allow the 2nd, then we need to do two
-//  // phase elaboration.
-//  Scope_sentinel scope(*this, d->scope());
-//  for (Decl*& f : d->fields_)
-//    f = elaborate_decl(f);
-//  for (Decl*& m : d->members_)
-//    m = elaborate_decl(m);
-//
-//  // Elaborate member definitions. See comments
-//  // above about handling member defintions.
-//  for (Decl*& m : d->members_)
-//    m = elaborate_def(m);
-//
-//  defined.insert(d);
-//  return d;
+  // If the declaration has already been declared,
+  // then don't re-elaborate it.
+  if (defined.count(d))
+    return d;
 
-    //----------
+  // Prevent recursive type definitions.
+  if (is_defining(d)) {
+    std::cerr << format("cyclic definition of '{}'\n", *d->name());
+    for (auto iter = defining.rbegin(); iter != defining.rend(); ++iter) {
+      if (*iter == d)
+        break;
+      std::cerr << format("  referenced in the definition of '{}'\n", *(*iter)->name());
+    }
+    throw Type_error(locate(d), format("cyclic definition of '{}'", *d->name()));
+  }
 
+  Defining_sentinel def(*this, d);
+  // Elaborate fields and then method declarations.
+  //
+  // TODO: What are the lookup rules for default
+  // member initializers. If we do this:
+  //
+  //    struct S {
+  //      x : int = 1;
+  //      y : int = x + 2; // Seems resonable.
+  //
+  //      a : int = b - 1; // OK?
+  //      b : int = 0;
+  //      // Making this okay could impose an alternative
+  //      // initialization order.
+  //
+  //      g : int = f();   // OK?
+  //      def f() -> int { ... }
+  //      // What if f() refers to an uninitialized fiedl?
+  //    }
+  //
+  // If we allow the 2nd, then we need to do two
+  // phase elaboration.
+    // Elaborate parent
+    Scope_sentinel scope(*this, d->scope());
+    if(d->base_ != nullptr) {
+        Record_type const *base = cast<Record_type>(elaborate(d->base_));
+        d->base_decl = base->declaration();
+    }
 
-        declare(d);
+  for (Decl*& f : d->fields_)
+    f = elaborate_decl(f);
+  for (Decl*& m : d->members_)
+    m = elaborate_decl(m);
 
-        // Elaborate parent
-        if(d->base_ != nullptr) {
-            Record_type const* base = cast<Record_type>(elaborate(d->base_));
-            d->base_decl = base->declaration();
-//    for(Decl*& f : base->declaration()->fields_){
-//      d->fields_.push_back(f);
-//    }
-//    for(Decl*& m : base->declaration()->members_){
-//      d->members_.push_back(m);
-//    }
+  // Elaborate member definitions. See comments
+  // above about handling member defintions.
+  for (Decl*& m : d->members_)
+    m = elaborate_def(m);
 
-        }
-
-        // Elaborate fields and then method declarations.
-        //
-        // TODO: What are the lookup rules for default
-        // member initializers. If we do this:
-        //
-        //    struct S {
-        //      x : int = 1;
-        //      y : int = x + 2; // Probably ok
-        //      a : int = b - 1; // OK?
-        //      b : int = 0;
-        //      c : int = f();   // OK?
-        //      def f() -> int { ... }
-        //    }
-        //
-        // If we allow the 2nd, then we need to do two
-        // phase elaboration.
-        Scope_sentinel scope(*this, d->scope());
-        for (Decl*& f : d->fields_)
-            f = elaborate_decl(f);
-        for (Decl*& m : d->members_)
-            m = elaborate_decl(m);
-
-        // Elaborate member definitions. See comments
-        // above about handling member defintions.
-        for (Decl*& m : d->members_)
-            m = elaborate_def(m);
-
-        return d;
+  defined.insert(d);
+  return d;
 }
 
 
